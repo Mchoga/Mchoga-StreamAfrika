@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.itemHolder>{
 
     Context context;
-    ArrayList<movie> mMovies;
+    ArrayList<movie> bannerMovies;
     LayoutInflater mInflater;
 
     public BannerAdapter() {
@@ -29,9 +29,10 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.itemHolder
     }
 
     public BannerAdapter(Context context, ArrayList<movie> movies) {
-        this.mMovies = movies;
+        this.bannerMovies = movies;
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
+
     }
 
 
@@ -50,17 +51,15 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.itemHolder
         holder.summary.setText("Summary: "+items.get(position).summary);
         holder.rating.setText("Rating: "+String.valueOf(items.get(position).rating));
         holder.year.setText("Year: "+String.valueOf(items.get(position).year));*/
-        Glide.with(context).load(mMovies.get(position).image).centerCrop().placeholder(R.drawable.ic_downloading).into(holder.image);
-        Log.d(TAG, "getItemCount here: "+mMovies.size());
+        Glide.with(context).load(bannerMovies.get(position).image).centerCrop().placeholder(R.drawable.ic_downloading).into(holder.image);
+
 
     }
 
 
     public int getItemCount() {
-        Log.d(TAG, "getItemCount here: "+mMovies.size());
-        return mMovies.size();
 
-
+        return bannerMovies.size();
     }
 
     public class itemHolder extends RecyclerView.ViewHolder {

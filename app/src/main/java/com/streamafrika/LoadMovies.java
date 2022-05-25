@@ -24,48 +24,58 @@ import java.util.ArrayList;
 
 public class LoadMovies {
      ArrayList<movie> movies = new ArrayList<>();
-     RecyclerView.Adapter adapter;
+     Context context;
 
-    public LoadMovies(Context context, String url, RecyclerView.Adapter adapter){
-        this.adapter = adapter;
-        RequestQueue requestque = Volley.newRequestQueue(context);
-        JsonObjectRequest object = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
-            @Override
-            public void onResponse(JSONObject response) {
+     public  LoadMovies(Context context, String url){
 
-                try {
+         RequestQueue requestqueue = VolleySingleton.getInstance(context).RequestQueue();//Volley.newRequestQueue(context);
+            this.context = context;
+            JsonObjectRequest object = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
-                    JSONObject object = response.getJSONObject("data");
-                    JSONArray array = object.getJSONArray("movies");
+                @Override
+                public void onResponse(JSONObject response) {
 
-                    for (int x = 0; x < array.length(); x++) {
-                        JSONObject movie = array.getJSONObject(x);
+                    try {
 
-                        movies.add(new movie(movie.getString("title").toString(), movie.getString("summary").toString(),
-                                Integer.parseInt(movie.getString("year")),
-                                Float.valueOf(movie.getString("rating")),movie.getString("large_cover_image"),movie.getInt("id"),movie.getJSONArray("genres"),context));
+                        JSONObject object = response.getJSONObject("data");
+                        JSONArray array = object.getJSONArray("movies");
 
+                        for (int x = 0; x < array.length(); x++) {
+                            JSONObject movie = array.getJSONObject(x);
+                            boolean available = false;
+                            for (int y=0; y< movies.size();y++){
+                                if(movies.get(y).id == movie.getInt("id")){
+                                    available =true;
+                                }
+
+                            }
+                            if (available == false) {
+                                movies.add(new movie(movie.getString("title").toString(), movie.getString("summary").toString(),
+                                        Integer.parseInt(movie.getString("year")),
+                                        Float.valueOf(movie.getString("rating")), movie.getString("large_cover_image"), movie.getInt("id"), movie.getJSONArray("genres"), context));
+                            }
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    MainActivity.adapterNotifier();
                 }
-                Log.d(TAG, "onResponse: "+movies.size());
-                //adapter.notifyDataSetChanged();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context, "Error Connecting", Toast.LENGTH_SHORT).show();
-            }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(context, "Error Connecting", Toast.LENGTH_SHORT).show();
+                }
 
 
-        });  requestque.add(object);
-    }
+            });
+            requestqueue.add(object);
+        }
 
-    public ArrayList<movie> movieList(){
-        //Log.d(TAG, "movieList: "+movies.size());
+
+        public ArrayList<movie> movieList(){
         return movies;
     }
 
